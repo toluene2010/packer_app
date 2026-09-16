@@ -1,69 +1,39 @@
 name: Build Kivy APK
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
-  build-apk:
-    name: Build Android APK
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Set up Python environment (Using 3.10 for better compatibility)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      # 3. Install system dependencies, including OpenJDK 17
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk \
-            python3-pip python3-virtualenv \
-            autoconf libtool pkg-config zlib1g-dev \
-            libncurses5-dev libncursesw5-dev libtinfo5 \
-            cmake libffi-dev libssl-dev
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev
+          sudo apt-get install -y build-essential python3 python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev
+          sudo apt-get install -y libgstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+          sudo apt-get install -y libsqlite3-dev sqlite3 bzip2 libbz2-dev zlib1g-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev libncursesw5-dev libffi-dev uuid-dev
 
-      # 4. Set JAVA_HOME for the Buildozer process
-      - name: Set up Java environment
-        run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
-
-      # 5. Cache Buildozer's global directory to speed up subsequent builds
-      - name: Cache Buildozer global directory
-        uses: actions/cache@v4
-        with:
-          path: .buildozer_global
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
-
-      # 6. Install Buildozer and its Python dependencies
       - name: Install Buildozer and dependencies
         run: |
-          pip install --upgrade buildozer cython virtualenv
-          # Ensure jnius compatibility for newer Python versions
-          pip install "jnius>=1.4.0"
+          pip install --upgrade pip
+          pip install buildozer
+          pip install cython==0.29.33
 
-      # 7. Build the APK using Buildozer
       - name: Build APK
         run: |
-          # 'yes |' is used to automatically accept Android SDK license agreements
-          yes | buildozer android debug
+          buildozer -v android debug
 
-      # 8. Upload the generated APK as an artifact
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: kivy-apk
+          name: packersentry-apk
           path: bin/*.apk
-          if-no-files-found: error
