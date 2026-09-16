@@ -9,8 +9,6 @@ version = 1.0
 
 android.api = 31
 android.minapi = 21
-android.ndk = 28c
-android.ndk_api = 21
 android.archs = arm64-v8a
 android.allow_backup = True
 android.accept_sdk_license = True
