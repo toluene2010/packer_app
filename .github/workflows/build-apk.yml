@@ -28,10 +28,12 @@ jobs:
             git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config \
             zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev libltdl-dev \
             build-essential ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
-            libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
-            libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
-            libsqlite3-dev sqlite3 bzip2 libbz2-dev openssl libgdbm-dev libgdbm-compat-dev \
-            liblzma-dev libreadline-dev libncursesw5-dev uuid-dev
+            libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev \
+            libavcodec-dev libgstreamer1.0-0 \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            libsqlite3-dev sqlite3 bzip2 libbz2-dev openssl \
+            libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev \
+            libncursesw5-dev uuid-dev
 
       - name: Install Python build tools
         run: |
@@ -43,13 +45,13 @@ jobs:
 
       - name: Clean Buildozer cache
         run: |
-          buildozer android clean || true
           rm -rf .buildozer
+          rm -rf bin
 
-      - name: Verify Buildozer config
+      - name: Verify Buildozer configuration
         run: |
+          test -f buildozer.spec
           grep -nE '^\[app\]|^version[[:space:]]*=' buildozer.spec
-          buildozer checkconfig
 
       - name: Build APK
         run: |
@@ -61,3 +63,4 @@ jobs:
         with:
           name: packersentry-apk
           path: bin/*.apk
+          if-no-files-found: error
