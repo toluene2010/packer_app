@@ -46,6 +46,11 @@ jobs:
           buildozer android clean || true
           rm -rf .buildozer
 
+      - name: Verify Buildozer config
+        run: |
+          grep -nE '^\[app\]|^version[[:space:]]*=' buildozer.spec
+          buildozer checkconfig
+
       - name: Build APK
         run: |
           buildozer --version
