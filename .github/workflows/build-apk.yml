@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install system dependencies
         run: |
@@ -28,12 +28,10 @@ jobs:
             git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config \
             zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev libltdl-dev \
             build-essential ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev \
-            libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev \
-            libavcodec-dev libgstreamer1.0-0 \
-            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
-            libsqlite3-dev sqlite3 bzip2 libbz2-dev openssl \
-            libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev \
-            libncursesw5-dev uuid-dev
+            libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
+            libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            libsqlite3-dev sqlite3 bzip2 libbz2-dev openssl libgdbm-dev libgdbm-compat-dev \
+            liblzma-dev libreadline-dev libncursesw5-dev uuid-dev
 
       - name: Install Python build tools
         run: |
@@ -48,19 +46,14 @@ jobs:
           rm -rf .buildozer
           rm -rf bin
 
-      - name: Verify Buildozer configuration
-        run: |
-          test -f buildozer.spec
-          grep -nE '^\[app\]|^version[[:space:]]*=' buildozer.spec
-
       - name: Build APK
         run: |
-          buildozer --version
-          buildozer -v android debug --stacktrace
+          set -o pipefail
+          buildozer -v android debug --stacktrace 2>&1 | tee buildozer.log
 
-      - name: Upload APK
+      - name: Upload Buildozer log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: packersentry-apk
-          path: bin/*.apk
-          if-no-files-found: error
+          name: buildozer-log
+          path: buildozer.log
