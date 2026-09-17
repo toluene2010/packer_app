@@ -262,22 +262,19 @@ class ProductPicker(Popup):
         super().__init__(title="Select Product", size_hint=(0.95, 0.9), **kwargs)
         self.on_pick = on_pick
 
-        root = BoxLayout(orientation="vertical", padding=dp(10), spacing=dp(10))
+        root = BoxLayout(orientation="vertical", padding=8, spacing=8)
 
         self.search = TextInput(
             hint_text="Type to search product...",
             multiline=False,
             size_hint_y=None,
-            height=dp(50),
-            font_size=dp(17),
+            height=48,
         )
         self.search.bind(text=self.refresh)
         root.add_widget(self.search)
 
         self.scroll = ScrollView()
-        self.list_layout = BoxLayout(
-            orientation="vertical", size_hint_y=None, spacing=dp(2)
-        )
+        self.list_layout = BoxLayout(orientation="vertical", size_hint_y=None, spacing=2)
         self.list_layout.bind(minimum_height=self.list_layout.setter("height"))
         self.scroll.add_widget(self.list_layout)
         root.add_widget(self.scroll)
@@ -294,10 +291,9 @@ class ProductPicker(Popup):
             btn = Button(
                 text=item,
                 size_hint_y=None,
-                height=dp(48),
+                height=44,
                 halign="left",
                 valign="middle",
-                font_size=dp(15),
             )
             btn.bind(on_release=lambda b, text=item: self.pick(text))
             self.list_layout.add_widget(btn)
@@ -312,41 +308,40 @@ class PackerForm(BoxLayout):
         super().__init__(orientation="vertical", **kwargs)
         Window.softinput_mode = "below_target"
 
+        self.fields = {}
+
         # ---------- Header ----------
-        header = Label(
+        self.add_widget(Label(
             text="Packers Daily Entry",
             font_size=dp(22),
             bold=True,
             size_hint_y=None,
-            height=dp(55),
+            height=dp(50),
             color=(0.15, 0.45, 0.85, 1),
-        )
-        self.add_widget(header)
+        ))
 
         # ---------- Scrollable form ----------
         scroll = ScrollView(size_hint=(1, 1))
-        form_grid = GridLayout(
+        grid = GridLayout(
             cols=2,
             spacing=dp(10),
-            padding=dp(15),
+            padding=dp(12),
             size_hint_y=None,
         )
-        form_grid.bind(minimum_height=form_grid.setter("height"))
-
-        self.fields = {}
+        grid.bind(minimum_height=grid.setter("height"))
 
         def add_row(label_text, key, hint="", input_type="text"):
             lbl = Label(
                 text=label_text,
                 size_hint_x=0.4,
                 size_hint_y=None,
-                height=dp(55),
+                height=dp(54),
                 halign="left",
                 valign="middle",
                 font_size=dp(16),
             )
             lbl.bind(size=lbl.setter("text_size"))
-            form_grid.add_widget(lbl)
+            grid.add_widget(lbl)
 
             ti = TextInput(
                 hint_text=hint,
@@ -354,61 +349,54 @@ class PackerForm(BoxLayout):
                 input_type=input_type,
                 size_hint_x=0.6,
                 size_hint_y=None,
-                height=dp(55),
+                height=dp(54),
                 font_size=dp(16),
             )
-            form_grid.add_widget(ti)
+            grid.add_widget(ti)
             self.fields[key] = ti
+            return ti
 
-        # 1. Date
         add_row("Date:", "date", "YYYY-MM-DD")
         self.fields["date"].text = datetime.now().strftime("%Y-%m-%d")
 
-        # 2. Product (picker)
+        # Product row
         prod_lbl = Label(
             text="Product:",
             size_hint_x=0.4,
             size_hint_y=None,
-            height=dp(55),
+            height=dp(54),
             halign="left",
             valign="middle",
             font_size=dp(16),
         )
         prod_lbl.bind(size=prod_lbl.setter("text_size"))
-        form_grid.add_widget(prod_lbl)
+        grid.add_widget(prod_lbl)
 
         self.product_btn = Button(
             text="Tap to choose product",
             size_hint_x=0.6,
             size_hint_y=None,
-            height=dp(55),
+            height=dp(54),
             font_size=dp(16),
             background_color=(0.2, 0.6, 0.85, 1),
         )
         self.product_btn.bind(on_release=self.open_product_picker)
-        form_grid.add_widget(self.product_btn)
+        grid.add_widget(self.product_btn)
         self.selected_product = ""
 
-        # 3. Batch No
         add_row("Batch No:", "batch_no")
-
-        # 4. Output
         add_row("Output:", "output", input_type="number")
-
-        # 5. No of Packers
         add_row("No of Packers:", "no_of_packers", input_type="number")
-
-        # 6. Batch size
         add_row("Batch size:", "batch_size", input_type="number")
 
-        scroll.add_widget(form_grid)
+        scroll.add_widget(grid)
         self.add_widget(scroll)
 
-        # ---------- Status label ----------
+        # ---------- Status ----------
         self.status = Label(
             text="Ready",
             size_hint_y=None,
-            height=dp(34),
+            height=dp(32),
             font_size=dp(15),
             color=(0.3, 0.5, 0.3, 1),
         )
@@ -417,33 +405,27 @@ class PackerForm(BoxLayout):
         # ---------- Buttons ----------
         button_row = BoxLayout(
             size_hint_y=None,
-            height=dp(65),
-            spacing=dp(10),
-            padding=dp(10),
+            height=dp(64),
+            spacing=dp(8),
+            padding=dp(8),
         )
 
         submit_btn = Button(
-            text="Submit",
-            font_size=dp(18),
-            bold=True,
+            text="Submit", font_size=dp(18), bold=True,
             background_color=(0.2, 0.7, 0.3, 1),
         )
         submit_btn.bind(on_release=self.submit)
         button_row.add_widget(submit_btn)
 
         sync_btn = Button(
-            text="Sync",
-            font_size=dp(18),
-            bold=True,
+            text="Sync", font_size=dp(18), bold=True,
             background_color=(0.9, 0.6, 0.2, 1),
         )
         sync_btn.bind(on_release=self.sync_queue)
         button_row.add_widget(sync_btn)
 
         clear_btn = Button(
-            text="Clear",
-            font_size=dp(18),
-            bold=True,
+            text="Clear", font_size=dp(18), bold=True,
             background_color=(0.8, 0.3, 0.3, 1),
         )
         clear_btn.bind(on_release=self.clear_form)
