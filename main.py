@@ -7,8 +7,10 @@ from datetime import datetime
 import requests
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.metrics import dp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
@@ -260,19 +262,22 @@ class ProductPicker(Popup):
         super().__init__(title="Select Product", size_hint=(0.95, 0.9), **kwargs)
         self.on_pick = on_pick
 
-        root = BoxLayout(orientation="vertical", padding=8, spacing=8)
+        root = BoxLayout(orientation="vertical", padding=dp(10), spacing=dp(10))
 
         self.search = TextInput(
             hint_text="Type to search product...",
             multiline=False,
             size_hint_y=None,
-            height=48,
+            height=dp(50),
+            font_size=dp(17),
         )
         self.search.bind(text=self.refresh)
         root.add_widget(self.search)
 
         self.scroll = ScrollView()
-        self.list_layout = BoxLayout(orientation="vertical", size_hint_y=None, spacing=2)
+        self.list_layout = BoxLayout(
+            orientation="vertical", size_hint_y=None, spacing=dp(2)
+        )
         self.list_layout.bind(minimum_height=self.list_layout.setter("height"))
         self.scroll.add_widget(self.list_layout)
         root.add_widget(self.scroll)
@@ -289,9 +294,10 @@ class ProductPicker(Popup):
             btn = Button(
                 text=item,
                 size_hint_y=None,
-                height=44,
+                height=dp(48),
                 halign="left",
                 valign="middle",
+                font_size=dp(15),
             )
             btn.bind(on_release=lambda b, text=item: self.pick(text))
             self.list_layout.add_widget(btn)
@@ -303,61 +309,147 @@ class ProductPicker(Popup):
 
 class PackerForm(BoxLayout):
     def __init__(self, **kwargs):
-        super().__init__(orientation="vertical", padding=12, spacing=10, **kwargs)
+        super().__init__(orientation="vertical", **kwargs)
         Window.softinput_mode = "below_target"
+
+        # ---------- Header ----------
+        header = Label(
+            text="Packers Daily Entry",
+            font_size=dp(22),
+            bold=True,
+            size_hint_y=None,
+            height=dp(55),
+            color=(0.15, 0.45, 0.85, 1),
+        )
+        self.add_widget(header)
+
+        # ---------- Scrollable form ----------
+        scroll = ScrollView(size_hint=(1, 1))
+        form_grid = GridLayout(
+            cols=2,
+            spacing=dp(10),
+            padding=dp(15),
+            size_hint_y=None,
+        )
+        form_grid.bind(minimum_height=form_grid.setter("height"))
 
         self.fields = {}
 
         def add_row(label_text, key, hint="", input_type="text"):
-            row = BoxLayout(size_hint_y=None, height=52, spacing=6)
-            row.add_widget(Label(text=label_text, size_hint_x=0.35, halign="left"))
+            lbl = Label(
+                text=label_text,
+                size_hint_x=0.4,
+                size_hint_y=None,
+                height=dp(55),
+                halign="left",
+                valign="middle",
+                font_size=dp(16),
+            )
+            lbl.bind(size=lbl.setter("text_size"))
+            form_grid.add_widget(lbl)
 
             ti = TextInput(
                 hint_text=hint,
                 multiline=False,
                 input_type=input_type,
-                size_hint_x=0.65,
+                size_hint_x=0.6,
+                size_hint_y=None,
+                height=dp(55),
+                font_size=dp(16),
             )
-            row.add_widget(ti)
-            self.add_widget(row)
-
+            form_grid.add_widget(ti)
             self.fields[key] = ti
-            return ti
 
+        # 1. Date
         add_row("Date:", "date", "YYYY-MM-DD")
         self.fields["date"].text = datetime.now().strftime("%Y-%m-%d")
 
-        product_row = BoxLayout(size_hint_y=None, height=52, spacing=6)
-        product_row.add_widget(Label(text="Product:", size_hint_x=0.35))
-        self.product_btn = Button(text="Tap to choose product", size_hint_x=0.65)
+        # 2. Product (picker)
+        prod_lbl = Label(
+            text="Product:",
+            size_hint_x=0.4,
+            size_hint_y=None,
+            height=dp(55),
+            halign="left",
+            valign="middle",
+            font_size=dp(16),
+        )
+        prod_lbl.bind(size=prod_lbl.setter("text_size"))
+        form_grid.add_widget(prod_lbl)
+
+        self.product_btn = Button(
+            text="Tap to choose product",
+            size_hint_x=0.6,
+            size_hint_y=None,
+            height=dp(55),
+            font_size=dp(16),
+            background_color=(0.2, 0.6, 0.85, 1),
+        )
         self.product_btn.bind(on_release=self.open_product_picker)
-        product_row.add_widget(self.product_btn)
-        self.add_widget(product_row)
+        form_grid.add_widget(self.product_btn)
         self.selected_product = ""
 
+        # 3. Batch No
         add_row("Batch No:", "batch_no")
+
+        # 4. Output
         add_row("Output:", "output", input_type="number")
+
+        # 5. No of Packers
         add_row("No of Packers:", "no_of_packers", input_type="number")
+
+        # 6. Batch size
         add_row("Batch size:", "batch_size", input_type="number")
 
-        button_row = BoxLayout(size_hint_y=None, height=56, spacing=8)
+        scroll.add_widget(form_grid)
+        self.add_widget(scroll)
 
-        submit_btn = Button(text="Submit")
+        # ---------- Status label ----------
+        self.status = Label(
+            text="Ready",
+            size_hint_y=None,
+            height=dp(34),
+            font_size=dp(15),
+            color=(0.3, 0.5, 0.3, 1),
+        )
+        self.add_widget(self.status)
+
+        # ---------- Buttons ----------
+        button_row = BoxLayout(
+            size_hint_y=None,
+            height=dp(65),
+            spacing=dp(10),
+            padding=dp(10),
+        )
+
+        submit_btn = Button(
+            text="Submit",
+            font_size=dp(18),
+            bold=True,
+            background_color=(0.2, 0.7, 0.3, 1),
+        )
         submit_btn.bind(on_release=self.submit)
         button_row.add_widget(submit_btn)
 
-        sync_btn = Button(text="Sync")
+        sync_btn = Button(
+            text="Sync",
+            font_size=dp(18),
+            bold=True,
+            background_color=(0.9, 0.6, 0.2, 1),
+        )
         sync_btn.bind(on_release=self.sync_queue)
         button_row.add_widget(sync_btn)
 
-        clear_btn = Button(text="Clear")
+        clear_btn = Button(
+            text="Clear",
+            font_size=dp(18),
+            bold=True,
+            background_color=(0.8, 0.3, 0.3, 1),
+        )
         clear_btn.bind(on_release=self.clear_form)
         button_row.add_widget(clear_btn)
 
         self.add_widget(button_row)
-
-        self.status = Label(text="Ready", size_hint_y=None, height=32)
-        self.add_widget(self.status)
 
     def open_product_picker(self, instance):
         ProductPicker(on_pick=self.set_product).open()
