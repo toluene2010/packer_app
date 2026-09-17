@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime
 
+import requests
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
@@ -12,8 +13,6 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-
-import requests
 
 
 FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfnrxirexXQPaTAI7Bww1iJTt2lYx6I2pdJUTY0u5hYMXQXrg/formResponse"
@@ -37,138 +36,22 @@ PRODUCTS = [
     "ALLERGIN 60ML SYRUP",
     "AMIBAGYL 60ML SUSPENSION",
     "HOSPIMOX (AMOXYCILLIN) 125MG 100ML SUSPENSION",
-    "CILLINOX SUSP. (AMPI/CLOX) 100MLS",
-    "AMIBAGYL TABLETS 200MG",
-    "BANEDIF OINTMENT",
-    "BANEDIF POWDER",
     "CHEMOTRIM 100ML SUSPENSION",
-    "CILLINOX 12ML DROPS",
     "CITRAMIN 15ML DROPS",
-    "CHLORAF 100ML SUSPENSION",
-    "CHEMOTRIM TAB 480MG (10X10)",
-    "CHEMOTRIM 60ML SUSPENSION",
     "DETONIC 200ML SYRUP",
-    "DIASTOP 100ML SUSPENSION",
-    "DETONIC SYRUP (1 LTR)",
-    "ENAPHRIN NASAL DROPS (10ML)",
-    "FUNGUSOL 20GM CREAM",
-    "FUNGUSOL 20GM POWDER",
-    "FUNGUSOL 50ML LOTION",
-    "GLIBENOL CAPLETS 5MG (10X10)",
-    "AFRAB CHLOROQUINE DROPS 11ML",
-    "AFRAB IBUPROFEN SUSPENSION",
-    "LA-TESEN TABLETS",
-    "NOSPAMIN 15ML DROPS",
-    "NOCOF DROPS",
-    "OTO MED 8ML DROPS",
     "PANDA 15ML DROPS",
     "PANDA 60ML SYRUP",
-    "PANDA TABLET 96'S",
-    "PANDA TABLET 1000'S",
-    "PANDA COLD DROPS",
-    "REUMEX LOTION",
     "STOPACID 200ML SUSPENSION",
-    "TUSSYLIN 100ML SYRUP [Adult]",
-    "TUSSYLIN 100ML SYRUP [Infant]",
-    "CITRAMIN SYRUP 100ML",
-    "CYSTAZOLE SUSPENSION",
-    "HALOPERIDOL TABLETS (10MG)",
-    "HALOPERIDOL TABLETS (5MG)",
-    "PANDA COLD SYRUP",
-    "PANDA NIGHT CAPLETS (500MG) 10X10",
-    "CYSTAZOLE CAPLETS (200MG)",
-    "NOCOF SYRUP",
-    "FUNGUSOL PLUS CREAM",
-    "FUNGUSOL PLUS LOTION",
+    "AFRAB CHLOROQUINE DROPS 11ML",
+    "AFRAB IBUPROFEN SUSPENSION",
     "AFRAB LORATADINE SYRUP (60ML)",
-    "AFRAB LORATADINE TABS (10X10)",
-    "AFRAB LORATADINE TABS 10MG (10 X 2)",
-    "DETONIC PLUS SYRUP",
     "AFRAB METFORMIN TABLETS (3 X 10)",
-    "PANDA NIGHT CAPLETS (12 X 8)",
-    "AMIBAGYL TABLETS 200MG (1000'S)",
-    "AFRABVITE PLUS DROPS",
-    "AFRAMIN SYRUP (200ML)",
-    "PANDA NIGHT SYRUP (60ML)",
-    "AFRAB IVY SYRUP (100ML)",
-    "THIVY SYRUP (100ML)",
-    "AFRAB GRIPE WATER (100ML)",
-    "STOPACID 200ML SUSPENSION (strawberry)",
-    "STOPACID 200ML SUSPENSION (banana)",
-    "PANDA SUSPENSION (60ML)",
-    "AFRAB CIPROFLOXACIN CAPLET 500MG (10'S)",
-    "PANDA NIGHT CAPLETS (2x10)",
-    "PANDA CAPLETS 500mg (10X10)",
-    "PANDA CAPLETS 500mg (10 X 2)",
-    "PANDA NIGHT DROPS (15ML)",
-    "AFRAGRA TABLETS (100MG (1 X 4)",
-    "HOSPIMOX CAPSULES",
-    "NOSPAMIN SYRUP",
-    "AFRAB LEVOFLOXACIN CAPLET 500MG (10'S)",
-    "CITRAMIN PLUS TAB (Effervescent)",
-    "AFRAB ALENDOMAX 70mg",
-    "B-Cor 2.5MG (10X3)",
-    "B-Cor 5MG (15 X 2)",
-    "B-Cor TABLETS 10MG (10 X 3)",
-    "AFRAB RESPAL 1mg (2 X 10)",
-    "AFRAB RISPERIDON 2mg (2 X 10)",
-    "AFRAB RISPERIDON 4mg (2 X 10)",
-    "PANDA EXTRA CAPLETS 500MG (10X10)",
-    "AFRAB SALBUTAMOL SYRUP 100ML",
-    "LATESEN DS CAPLETS (1 X 6)",
-    "AFRAB SALBUTAMOL TABLET 4MG (10X10)",
-    "ALFALEX CAPSULES 200MG (1 X 10)",
-    "ALFALEX CAPSULES 400MG",
-    "HISTOLAT SYRUP (60ML)",
-    "HISTOLAT TABLETS (5MG)",
-    "ALFADOX TABLETS (3x1)",
-    "AFRAB IBUPROFEN DS DROPS 30ML",
-    "ALFADOX SUSPENSION (15ML)",
-    "AFRABRON SYRUP(200ML)",
-    "ULTRA LINC TABLETS 5MG(2x15)",
-    "ULTRA LINC TABLETS 20MG(1x4)",
-    "AFRADIN DROPS(30ML)",
-    "DEKOLIK SYRUP(60ML)",
-    "AFRAB IBUPROFEN EFFERVESCENT",
-    "AFRAB IBUPROFEN DS SUSPENSION 100ML",
-    "PANDA EFFERVESCENT",
-    "AFRAB TERAD DROPS(25ML)",
-    "AFRAB SIMETHICONE DROPS",
-    "TERAD CAPLETS (1X30)",
-    "CITRAMIN DROPS 30ML",
-    "AFRABVITE DROPS 30ML",
-    "AFRABVITE PLUS DROPS 30ML",
-    "PANDA DROPS 30ML",
-    "NOCOF DROPS 30ML",
-    "SOLOMAX SYRUP 100ML",
-    "AFRABLEX SYRUP (100ML)",
-    "AFRAB ZINC 11MG TABLETS(10 X 3)",
-    "AFRAB LORATADINE SYRUP 100ML",
-    "AFRAB ORS POWDER(3x1)",
-    "AFRAB ZINC SULPHATE 20MG TABLETS(1 X 10)",
-    "AFRAB HAND SANITIZER (100ML)",
-    "METFORMIN TABLETS(10 X 10)",
-    "AFRAB CHLOROQUINE TABLETS(1 x 10)",
-    "LA-TESEN TABLETS 20/120MG (2 X 24)",
-    "CETRAZEE TABLETS 60's",
-    "AFRAB HYOSCINE BUTYLBROMIDE SYRUP",
-    "LATESEN DISPERSIBLE TABS (6'S)",
-    "DETONIC SYRUP (100ML)",
-    "RESPERIDONE SYRUP",
-    "IBUPROFEN TABLETS",
-    "AFRABRON TABLETS(3 X 10)",
-    "AFRAB LISINOPRIL TABLET 5MG(2 X 14)",
-    "AFRAB LISINOPRIL TABLET 10MG(2 X 14)",
-    "AFRAB AMLODIPINE TABLETS 5MG(2 X 14)",
-    "AFRAB AMLODIPINE TABLETS 10MG(2 X 14)",
+    "AFRAB BRON SYRUP (200ML)",
+    "AMIBAGYL TABLETS 200MG",
+    "PANDA NIGHT CAPLETS (500MG) 10X10",
     "VITA JOY MOOD CARE TABLETS",
     "VITA JOY NEURO CARE TABLETS",
-    "VITA JOY POSTNATAL CARE TABLETS",
-    "VITA JOY PRENATAL CARE TABLETS",
     "VITA JOY SLEEP CARE TABLETS",
-    "VITA JOY STRESS RELAX CARE TABLETS",
-    "VITA JOY FEMALE TEEN CARE TABLETS",
-    "VITA JOY MALE TEEN CARE TABLETS",
 ]
 
 
@@ -311,8 +194,7 @@ class PackerForm(BoxLayout):
 
         def add_row(label_text, key, hint="", input_type="text"):
             row = BoxLayout(size_hint_y=None, height=52, spacing=6)
-            label = Label(text=label_text, size_hint_x=0.35, halign="left")
-            row.add_widget(label)
+            row.add_widget(Label(text=label_text, size_hint_x=0.35, halign="left"))
 
             ti = TextInput(
                 hint_text=hint,
@@ -353,6 +235,7 @@ class PackerForm(BoxLayout):
 
         # Buttons
         button_row = BoxLayout(size_hint_y=None, height=56, spacing=8)
+
         submit_btn = Button(text="Submit")
         submit_btn.bind(on_release=self.submit)
         button_row.add_widget(submit_btn)
@@ -416,7 +299,7 @@ class PackerForm(BoxLayout):
         self.selected_product = ""
         self.product_btn.text = "Tap to choose product"
 
-        for key, field in self.fields.items():
+        for field in self.fields.values():
             field.text = ""
 
         self.fields["date"].text = datetime.now().strftime("%Y-%m-%d")
